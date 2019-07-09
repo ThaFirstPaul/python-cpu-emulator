@@ -1,16 +1,23 @@
 class flagregister():
     def __init__(self, bus):
-        fReg.state = "0000"
-        self.name = name
+        self.state = ("0","0","0","0")
+        #             | | |  \_CFlag
+        #             | |  \_ZFlag
+        #             |  \_
+        #              \ 
         self.bus = bus
 
-        print("Flag \"{}\" created.".format(self.name))
+        print("Flag register created.")
 
     def get(self):
-        self.bus.state = self.state.zfill(8)
+        self.bus.state = "".join(self.state).zfill(8)
 
     def reset(self):
-        self.state = "0000"
+        self.state = ("0","0","0","0")
 
     def enableFlag(self, flag):
-        if flag = 
+        if flag == 0:
+            self.state = (self.state[0], self.state[1], self.state[2], "1")
+        elif flag == 1:
+            self.state = (self.state[0], self.state[1], "1", self.state[3])
+            
