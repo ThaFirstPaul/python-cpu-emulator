@@ -21,3 +21,6 @@ class counter():
             self.state = 0
         else:
             self.state += 1
+
+    def reset(self):
+        self.state = 0

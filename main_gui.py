@@ -36,6 +36,7 @@ if __name__ == "__main__":
     
     bus = bus_()
     regA = register("A", bus)
+    regB = register("B", bus)
     regi = register("Instruction", bus)
     pcntr = counter("Program Counter" ,bus, 1023)
     icntr = counter("Instrunction Counter", bus, 4)
@@ -46,9 +47,9 @@ if __name__ == "__main__":
     disp = digitmodule(bus, "disp")
     inp = inp_(bus)
 
-    mb = motherboard(bus, 1.5, regA, None, alu, regi, pcntr, icntr, z_flag, c_flag, mem, disp, inp)
+    mb = motherboard(bus, 1.5, regA, regB, alu, regi, pcntr, icntr, z_flag, c_flag, mem, disp, inp)
 
-    f = open("/Users/paulvonlutzow/Desktop/MyContent/Programming/Python/16bit-singlebus-computer/hdd.txt","r")
+    f = open("hdd.txt","r")
     c = f.read().split("\n")
     f.close()
     ii = 0
@@ -78,13 +79,14 @@ if __name__ == "__main__":
         global stepping
         stepping = True
         clock_status.config(text="Status: Stepping")
+        mb.running == True
         while stepping:
             
             step()
             root.update()
     
-#            if (mb.running == False):
-#                stepping = False
+            if (mb.running == False):
+                stop()
 
     def stop(*args):
         global stepping
@@ -96,7 +98,7 @@ if __name__ == "__main__":
         exec(c)
     
     def ldhdd(*args):
-        f = open("/Users/paulvonlutzow/Desktop/MyContent/Programming/Python/16bit-singlebus-computer/hdd.txt","r")
+        f = open("hdd.txt","r")
         c = f.read().split("\n")
         f.close()
         ii = 0
@@ -153,7 +155,7 @@ if __name__ == "__main__":
 
     memlist.bind("<Double-Button-1>",editmem)
     memlist.bind("<Button-1>",stop)
-    memlist.bind("<Button-2>",set_ip)
+    #memlist.bind("<Button-2>",set_ip)
 
     #bus
     bus_label = Label(root, text ="Bus", borderwidth=2, relief="groove")

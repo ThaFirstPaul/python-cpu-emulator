@@ -23,3 +23,6 @@ class digitmodule():
 #            self.displaystate = ls[f-10]
         #print("Digit display \"{}\" updated to: {}".format(self.name, self.displaystate))
 
+    def reset(self):
+        self.state = "00000000"
+        self.displaystate = "0"

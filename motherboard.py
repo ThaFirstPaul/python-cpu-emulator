@@ -1,6 +1,6 @@
 import time
 class motherboard():
-    def __init__(self, bus, clockwait, regA, regB, alu, regi, pcntr, icntr, z_flag, c_flag, mem, display=None, inp=None, running=True):
+    def __init__(self, bus, clockwait, regA, regB, alu, regi, pcntr, icntr, z_flag, c_flag, mem, display=None, inp=None, running=True, instr_file=None):
 
         self.bus = bus
         self.clockwait = clockwait
@@ -19,18 +19,33 @@ class motherboard():
         self.running = running
 
         self.debug = 1
-        
+
+        if not instr_file == None:
+            pass
+        else:
+            pass
 
         print("Motherboard created")
-        
 
-    def start(self):
+    def reset(self):
+        self.regA.reset()
+        self.regB.reset()
+        self.c_flag.reset()
+        self.z_flag.reset()
+        self.disp.reset()
+        self.inp.reset()
+
+        self.pc.reset()
+        self.ic.reset()
+        self.ir.reset()
+
+    def start(self, auto= False):
         while True:
             if self.running:
                 self.step()
                 if self.debug:
-                    print("pc={}  ic={}  bus={}  mem_addr={} mem_data={} regA={} disp={}".format(self.pc.state, self.ic.state, self.bus.state, self.mem.ap, self.mem.mem[self.mem.ap], self.regA.state, self.disp.displaystate), end='\r')
-                    self.c = input()
+                    print("pc={}  ic={}  bus={}  mem_addr={} mem_data={} regA={} disp={}\n".format(self.pc.state, self.ic.state, self.bus.state, self.mem.ap, self.mem.mem[self.mem.ap], self.regA.state, self.disp.displaystate), end='\r')
+                    if not auto: self.c = input()
                 else:
                     time.sleep(self.clockwait)
 
@@ -122,23 +137,60 @@ class motherboard():
                         self.pc.set()
                     
                     self.ic.state = 7
+
+
+            elif struc == "010001":
+                if self.ic.state == 3:
+                    self.bus.state = addr.zfill(16)
+                    self.mem.set_ap()
+                elif self.ic.state == 4:
+                    self.mem.get()
+                    self.regB.set()
                     
-            elif struc == "001010":
+                    self.ic.state = 7
+
+            elif struc == "010010":
+                if self.ic.state == 3:
+                    self.bus.state = addr.zfill(16)
+                    self.mem.set_ap()
+                elif self.ic.state == 4:
+                    self.regB.get()
+                    self.mem.set()
+                
+                    self.ic.state = 7
+
+            elif struc == "010101":
+                if self.ic.state == 3:
+                    self.bus.state = addr.zfill(16)
+                    self.regA.set()
+                    
+                    self.ic.state = 7
+                    
+            elif struc == "100000":
                 if self.ic.state == 3:
                     self.regA.get()
                     self.disp.set()
-                elif self.ic.state == 4:
-                    self.mem.get()
                     
                     self.ic.state = 7
-            
-            elif struc == "001100":
+
+            elif struc == "100001":
+                if self.ic.state == 3:
+                    self.regB.get()
+                    self.disp.set()
+                    
+                    self.ic.state = 7
+                    
+            elif struc == "100010":
                 if self.ic.state == 3:
                     self.inp.get()
                     self.inp.set("0000000000000000")
                     self.regA.set()
                     
                     self.ic.state = 7
+
+            elif struc == "111110":
+                time.sleep(int(addr,2)/1000)
+                self.ic.state = 7
                     
             elif struc == "111111":
                 if self.ic.state == 3:

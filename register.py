@@ -11,3 +11,6 @@ class register():
 
     def set(self):
         self.state = self.bus.state
+
+    def reset(self):
+        self.state = "0000000000000000"
